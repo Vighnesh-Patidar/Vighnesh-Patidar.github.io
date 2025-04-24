@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Systems - Tactical Portfolio</title>
+    <style>
+        :root {
+            --primary: #1a2634;
+            --secondary: #2d4356;
+            --accent: #00ff9d;
+            --text: #e6e6e6;
+            --grid: rgba(255, 255, 255, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+        
+        header {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent);
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .section-title .line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--accent);
+        }
+        
+        .coordinates {
+            font-size: 0.8rem;
+            color: var(--accent);
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .project-details {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .project-header {
+            margin-bottom: 2rem;
+            border-left: 2px solid var(--accent);
+            padding-left: 1rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        .tech-specs {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--secondary);
+            border: 1px solid var(--grid);
+            position: relative;
+        }
+        
+        .tech-specs::before {
+            content: 'TECHNICAL SPECIFICATIONS';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .spec-label {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .gallery-item {
+            height: 200px;
+            background-color: var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,255,157,0.2) 0%, transparent 50%);
+        }
+        
+        .tactical-button {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease;
+            margin-top: 1rem;
+            text-decoration: none;
+        }
+        
+        .tactical-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--accent);
+            transition: transform 0.3s ease;
+            z-index: -1;
+            transform: skewX(-15deg);
+        }
+        
+        .tactical-button:hover {
+            color: var(--primary);
+        }
+        
+        .tactical-button:hover::before {
+            transform: skewX(-15deg) translateX(100%);
+        }
+        
+        .code-block {
+            background-color: var(--secondary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .code-block::before {
+            content: 'SOURCE CODE SNIPPET';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .code-comment {
+            color: var(--accent);
+            opacity: 0.7;
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--accent);
+        }
+        
+        /* HUD-like elements */
+        .hud-element {
+            position: fixed;
+            color: var(--accent);
+            font-size: 0.8rem;
+            z-index: 10;
+            opacity: 0.8;
+        }
+        
+        .hud-top-left {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .hud-top-right {
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        
+        .hud-bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+        
+        .hud-bottom-right {
+            bottom: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        
+        .related-projects {
+            margin-top: 4rem;
+        }
+        
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .project-card {
+            background-color: var(--secondary);
+            border: 1px solid var(--grid);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .project-card h3 {
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .hud-element {
+                font-size: 0.7rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    
+    <!-- HUD Elements -->
+    <div class="hud-element hud-top-left">
+        SYS_INITIALIZED<br>
+        TARGET_ACQUIRED
+    </div>
+    <div class="hud-element hud-top-right">
+        LAT: 34°05'23"N<br>
+        LONG: 118°24'12"W
+    </div>
+    <div class="hud-element hud-bottom-left">
+        STATUS: ONLINE<br>
+        SYS_INTEGRITY: 100%
+    </div>
+    <div class="hud-element hud-bottom-right">
+        <span id="date-display"></span><br>
+        <span id="time-display"></span>
+    </div>
+    
+    <header>
+        <a href="index.html" class="logo">TACTICAL PORTFOLIO</a>
+        <div class="navigation">
+            <a href="index.html" class="tactical-button">MAIN INTEL</a>
+            <a href="firearms.html" class="tactical-button">FIREARMS</a>
+            <a href="quant.html" class="tactical-button">QUANT</a>
+        </div>
+    </header>
+    
+    <section id="embedded-overview" class="section">
+        <div class="section-title">
+            <h2>EMBEDDED SYSTEMS</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: EMB-001</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: CIRCUITRY</span>
+                    <span>2025</span>
+                </div>
+                <h3>IoT Security Framework</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Advanced security protocols developed for mission-critical Internet of Things infrastructure with real-time monitoring capabilities. Designed for deployment in sensitive environments where data integrity and secure communications are paramount.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">PRIMARY MCU</span>
+                        <span>ESP32-S3</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ENCRYPTION</span>
+                        <span>AES-256</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">POWER CONSUMPTION</span>
+                        <span>28mA @ 3.3V</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">COMM PROTOCOLS</span>
+                        <span>TLS 1.3, MQTT</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">TAMPER DETECTION</span>
+                        <span>ACTIVE</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">FIELD DEPLOYMENT</span>
+                        <span>TESTED</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Primary Objectives</h3>
+            <ul>
+                <li>Hardened communications protocols resistant to MITM attacks</li>
+                <li>Low-power operation for extended deployment scenarios</li>
+                <li>Physical tamper detection and countermeasures</li>
+                <li>Secure over-the-air update capability</li>
+                <li>Zero-trust architecture implementation</li>
+            </ul>
+            
+            <div class="code-block">
+                <pre><span class="code-comment">// Secure boot sequence with hardware-verified integrity check</span>
+void secureBootSequence() {
+    <span class="code-comment">// Verify hardware signature from secure element</span>
+    if (!verifyHardwareSignature()) {
+        initiateTamperResponse();
+        return;
+    }
+    
+    <span class="code-comment">// Verify firmware integrity using SHA-256</span>
+    if (!verifyFirmwareIntegrity()) {
+        lockdownMode();
+        return;
+    }
+    
+    <span class="code-comment">// Initialize encrypted communication channels</span>
+    initSecureComms();
+    
+    <span class="code-comment">// Start periodic attestation timer</span>
+    xTimerStart(attestationTimer, 0);
+    
+    systemStatus = SECURE_OPERATIONAL;
+}</pre>
+            </div>
+            
+            <h3>Implementation Details</h3>
+            <p>The IoT Security Framework utilizes a layered defense strategy, combining hardware-based security elements with software protection measures. Key components include:</p>
+            
+            <ol>
+                <li><strong>Secure Boot Process:</strong> Cryptographically verified boot sequence ensures only authentic firmware is executed.</li>
+                <li><strong>Hardware Security Module:</strong> Dedicated ATECC608A secure element for key storage and cryptographic operations.</li>
+                <li><strong>Encrypted Communications:</strong> All data transfer encrypted using TLS 1.3 with perfect forward secrecy.</li>
+                <li><strong>Runtime Protection:</strong> Memory protection units configured to prevent code execution from data regions.</li>
+                <li><strong>Intrusion Detection:</strong> Physical and network-level intrusion detection with configurable response thresholds.</li>
+            </ol>
+            
+            <h3>Field Deployment Results</h3>
+            <p>The system has been deployed in three critical infrastructure scenarios, demonstrating exceptional reliability and security performance:</p>
+            
+            <ul>
+                <li>Successful resistance against 17 simulated attack vectors</li>
+                <li>99.997% uptime over 6-month field test period</li>
+                <li>Power efficiency exceeding requirements by 22%</li>
+                <li>Zero false positive security alerts during normal operations</li>
+            </ul>
+        </div>
+    </section>
+    
+    <section id="microcontroller-project" class="section">
+        <div class="section-title">
+            <h2>LOW-POWER SENSOR NETWORK</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: EMB-002</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: MICROCONTROLLER</span>
+                    <span>2024</span>
+                </div>
+                <h3>Ultra-Efficient Power Management System</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Custom firmware engineered for ultra-efficient power management in remote deployment scenarios. Optimized for extended operation in field conditions with minimal power infrastructure.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">PRIMARY MCU</span>
+                        <span>STM32L4+</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">SLEEP CURRENT</span>
+                        <span>0.83µA</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ACTIVE CURRENT</span>
+                        <span>8.7mA @ 3.3V</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">SENSOR INTERFACE</span>
+                        <span>I2C, SPI, UART</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">POWER SOURCE</span>
+                        <span>18650 + SOLAR</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">DEPLOYMENT TIME</span>
+                        <span>36+ MONTHS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Key Innovations</h3>
+            <p>The system features several innovative power management techniques:</p>
+            
+            <ul>
+                <li>Dynamic clock scaling based on operational requirements</li>
+                <li>Intelligent sensor polling with adaptive intervals</li>
+                <li>Power domain isolation for inactive peripherals</li>
+                <li>Optimized radio transmission protocols with data batching</li>
+                <li>Environmental awareness for solar charging optimization</li>
+            </ul>
+            
+            <div class="code-block">
+                <pre><span class="code-comment">// Dynamic power state management based on environmental factors</span>
+void updatePowerState() {
+    <span class="code-comment">// Evaluate current power availability</span>
+    PowerStatus powerStat = evaluatePowerStatus();
+    
+    <span class="code-comment">// Check external environment conditions</span>
+    EnvironmentalFactors envFact = getEnvironmentalReadings();
+    
+    <span class="code-comment">// Calculate optimal power strategy</span>
+    PowerProfile optimalProfile = calculateOptimalPowerProfile(powerStat, envFact);
+    
+    <span class="code-comment">// Apply new power profile to subsystems</span>
+    applyPowerProfile(optimalProfile);
+    
+    <span class="code-comment">// Log power decision for later analysis</span>
+    if (optimalProfile.logThreshold > LOG_THRESHOLD_MIN) {
+        logPowerDecision(powerStat, envFact, optimalProfile);
+    }
+}</pre>
+            </div>
+            
+            <h3>Deployment Architecture</h3>
+            <p>The sensor network utilizes a mesh topology with hierarchical node arrangement:</p>
+            
+            <ol>
+                <li><strong>Sensor Nodes:</strong> Ultra-low power devices with basic sensing and communication capabilities.</li>
+                <li><strong>Aggregator Nodes:</strong> Intermediate data collection points with extended power resources.</li>
+                <li><strong>Gateway Node:</strong> Primary communication relay with satellite uplink capability.</li>
+            </ol>
+            
+            <p>Each node dynamically adjusts its role based on power availability and network conditions, ensuring maximum resilience and operational lifetime.</p>
+        </div>
+    </section>
+    
+    <section id="rtos-project" class="section">
+        <div class="section-title">
+            <h2>RTOS IMPLEMENTATION</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: EMB-003</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: FIRMWARE</span>
+                    <span>2024</span>
+                </div>
+                <h3>Tactical Field Equipment RTOS</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Optimized real-time operating system implementation for tactical field equipment with sub-millisecond response requirements. Designed for mission-critical applications where timing precision is paramount.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">PLATFORM</span>
+                        <span>ARM Cortex-M7</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">RTOS KERNEL</span>
+                        <span>FreeRTOS (Modified)</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ISR LATENCY</span>
+                        <span>0.72µs</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">TASK SWITCH</span>
+                        <span>1.2µs</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">DETERMINISM</span>
+                        <span>±0.3µs</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">CERTIFICATION</span>
+                        <span>MIL-STD-810G</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>System Architecture</h3>
+            <p>The RTOS implementation features a fully preemptive priority-based scheduler with the following custom enhancements:</p>
+            
+            <ul>
+                <li>Deterministic memory allocation with zero fragmentation</li>
+                <li>Priority inheritance protocol to prevent priority inversion</li>
+                <li>Lockless data structures for inter-core communication</li>
+                <li>Hardware-accelerated context switching</li>
+                <li>Integrated runtime verification module</li>
+            </ul>
+            
+            <div class="code-block">
+                <pre><span class="code-comment">// Priority inheritance mutex implementation for critical sections</span>
+bool mutex_acquire(mutex_t *mutex, uint32_t timeout_ms) {
+    <span class="code-comment">// Critical section entry with ISR masking</span>
+    CRITICAL_SECTION_ENTER();
+    
+    task_t *current_task = get_current_task();
+    
+    if (mutex->owner == NULL) {
+        <span class="code-comment">// Mutex is free, acquire it</span>
+        mutex->owner = current_task;
+        mutex->original_priority = current_task->priority;
+        CRITICAL_SECTION_EXIT();
+        return true;
+    } else if (mutex->owner == current_task) {
+        <span class="code-comment">// Recursive lock, increase count</span>
+        mutex->lock_count++;
+        CRITICAL_SECTION_EXIT();
+        return true;
+    } else {
+        <span class="code-comment">// Mutex is taken, apply priority inheritance</span>
+        if (current_task->priority > mutex->owner->priority) {
+            <span class="code-comment">// Boost owner's priority to prevent inversion</span>
+            task_set_priority(mutex->owner, current_task->priority);
+        }
+        
+        <span class="code-comment">// Add task to mutex wait list</span>
+        task_add_to_wait_list(&mutex->wait_list, current_task);
+        
+        CRITICAL_SECTION_EXIT();
+        
+        <span class="code-comment">// Wait for mutex with timeout</span>
+        return task_wait_for_notification(timeout_ms);
+    }
+}</pre>
+            </div>
+            
+            <h3>Performance Metrics</h3>
+            <p>The system has been rigorously tested under various load conditions:</p>
+            
+            <ul>
+                <li><strong>Maximum Task Count:</strong> 32 concurrent tasks without performance degradation</li>
+                <li><strong>Memory Footprint:</strong> 12.4KB for kernel, 3.2KB per task context</li>
+                <li><strong>Interrupt Response:</strong> 42 cycles worst-case from trigger to ISR entry</li>
+                <li><strong>Task Response Jitter:</strong> Less than 0.5µs under full system load</li>
+            </ul>
+            
+            <p>Testing conducted under simulated electromagnetic interference, extreme temperature conditions, and mechanical shock/vibration confirmed operational stability in adverse environments.</p>
+        </div>
+    </section>
+    
+    <section class="related-projects section">
+        <div class="section-title">
+            <h2>RELATED OPERATIONS</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: REL-001</div>
+        </div>
+        
+        <div class="related-grid">
+            <div class="project-card">
+                <div class="project-meta">
+                    <span>OPERATION: BALLISTICS</span>
+                    <span>2025</span>
+                </div>
+                <h3>Comparative Analysis: .308 Win vs 6.5 Creedmoor</h3>
+                <p>Technical breakdown of ballistic performance with field-tested data on long-range precision applications.</p>
+                <a href="firearms.html" class="tactical-button">VIEW INTEL</a>
+            </div>
+            <div class="project-card">
+                <div class="project-meta">
+                    <span>OPERATION: ALGORITHM</span>
+                    <span>2025</span>
+                </div>
+                <h3>High-Frequency Trading Strategy</h3>
+                <p>Engineered low-latency execution system with proprietary signal processing for microsecond advantage.</p>
+                <a href="quant.html" class="tactical-button">VIEW INTEL</a>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>© 2025 TACTICAL PORTFOLIO</p>
+        <p class="coordinates">END TRANSMISSION</p>
+    </footer>
+    
+    <script>
+        // Update date and time in HUD
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', dateOptions).replace(/\//g, '.');
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+        
+        // Scroll reveal animation
+        function revealOnScroll() {
+            const sections = document.querySelectorAll('.section');
+            
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (sectionTop < windowHeight * 0.75) {
+                    section.classList.add('active');
+                }
+            });
+        }
+        
+        // Initialize
+        window.onload = function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            window.addEventListener('scroll', revealOnScroll);
+            // Initial check for visible sections
+            revealOnScroll();
+        };
+    </script>
+</body>
+</html>

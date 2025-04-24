@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firearms Analysis - Tactical Portfolio</title>
+    <style>
+        :root {
+            --primary: #1a2634;
+            --secondary: #2d4356;
+            --accent: #00ff9d;
+            --text: #e6e6e6;
+            --grid: rgba(255, 255, 255, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+        
+        header {
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--accent);
+            position: relative;
+        }
+        
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+        
+        .section-title .line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--accent);
+        }
+        
+        .coordinates {
+            font-size: 0.8rem;
+            color: var(--accent);
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        .project-details {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .project-header {
+            margin-bottom: 2rem;
+            border-left: 2px solid var(--accent);
+            padding-left: 1rem;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--accent);
+        }
+        
+        .tech-specs {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--secondary);
+            border: 1px solid var(--grid);
+            position: relative;
+        }
+        
+        .tech-specs::before {
+            content: 'TECHNICAL SPECIFICATIONS';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .spec-label {
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .gallery-item {
+            height: 200px;
+            background-color: var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .gallery-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0,255,157,0.2) 0%, transparent 50%);
+        }
+        
+        .tactical-button {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s ease;
+            margin-top: 1rem;
+            text-decoration: none;
+        }
+        
+        .tactical-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--accent);
+            transition: transform 0.3s ease;
+            z-index: -1;
+            transform: skewX(-15deg);
+        }
+        
+        .tactical-button:hover {
+            color: var(--primary);
+        }
+        
+        .tactical-button:hover::before {
+            transform: skewX(-15deg) translateX(100%);
+        }
+        
+        .code-block {
+            background-color: var(--secondary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .data-block {
+            background-color: var(--secondary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .data-block::before {
+            content: 'BALLISTIC DATA';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        
+        .code-comment {
+            color: var(--accent);
+            opacity: 0.7;
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--accent);
+        }
+        
+        /* HUD-like elements */
+        .hud-element {
+            position: fixed;
+            color: var(--accent);
+            font-size: 0.8rem;
+            z-index: 10;
+            opacity: 0.8;
+        }
+        
+        .hud-top-left {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .hud-top-right {
+            top: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        
+        .hud-bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+        
+        .hud-bottom-right {
+            bottom: 20px;
+            right: 20px;
+            text-align: right;
+        }
+        
+        .related-projects {
+            margin-top: 4rem;
+        }
+        
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .project-card {
+            background-color: var(--secondary);
+            border: 1px solid var(--grid);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .project-card h3 {
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--grid);
+        }
+        
+        .comparison-table th {
+            background-color: var(--secondary);
+            color: var(--accent);
+            font-weight: normal;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: rgba(45, 67, 86, 0.4);
+        }
+        
+        .comparison-table tr:hover {
+            background-color: var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .image-gallery {
+                grid-template-columns: 1fr;
+            }
+            
+            .hud-element {
+                font-size: 0.7rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    
+    <!-- HUD Elements -->
+    <div class="hud-element hud-top-left">
+        SYS_INITIALIZED<br>
+        TARGET_ACQUIRED
+    </div>
+    <div class="hud-element hud-top-right">
+        LAT: 34°05'23"N<br>
+        LONG: 118°24'12"W
+    </div>
+    <div class="hud-element hud-bottom-left">
+        STATUS: ONLINE<br>
+        SYS_INTEGRITY: 100%
+    </div>
+    <div class="hud-element hud-bottom-right">
+        <span id="date-display"></span><br>
+        <span id="time-display"></span>
+    </div>
+    
+    <header>
+        <a href="index.html" class="logo">TACTICAL PORTFOLIO</a>
+        <div class="navigation">
+            <a href="index.html" class="tactical-button">MAIN INTEL</a>
+            <a href="embedded.html" class="tactical-button">EMBEDDED</a>
+            <a href="quant.html" class="tactical-button">QUANT</a>
+        </div>
+    </header>
+    
+    <section id="ballistics-analysis" class="section">
+        <div class="section-title">
+            <h2>BALLISTICS ANALYSIS</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: FA-001</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: BALLISTICS</span>
+                    <span>2025</span>
+                </div>
+                <h3>Comparative Analysis: .308 Win vs 6.5 Creedmoor</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Technical breakdown of ballistic performance with field-tested data on long-range precision applications. This analysis compares two popular cartridges used in precision rifle platforms, evaluating their performance across various metrics including external ballistics, terminal performance, and practical field applications.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">TEST PLATFORM (.308)</span>
+                        <span>Remington 700</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">TEST PLATFORM (6.5)</span>
+                        <span>Tikka T3x</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">BARREL LENGTH (.308)</span>
+                        <span>24"</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">BARREL LENGTH (6.5)</span>
+                        <span>24"</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">OPTICS</span>
+                        <span>Nightforce ATACR</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">TEST DISTANCE</span>
+                        <span>100-1000 YARDS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Performance Criteria</h3>
+            <p>The analysis focused on several key performance metrics required for tactical and precision applications:</p>
+            
+            <ul>
+                <li>External ballistics (trajectory, wind drift, energy retention)</li>
+                <li>Terminal performance and barrier penetration</li>
+                <li>Ammunition availability and consistency</li>
+                <li>Recoil characteristics and shooter fatigue</li>
+                <li>Barrel life considerations</li>
+            </ul>
+            
+            <h3>Data Collection Methodology</h3>
+            <p>Testing was conducted under controlled conditions using factory match-grade ammunition and handloaded precision rounds. Environmental factors were measured using Kestrel weather meters with Applied Ballistics software integration. All shots were recorded with chronographs for velocity data and high-speed cameras for visual confirmation.</p>
+            
+            <div class="data-block">
+                <pre>// .308 Winchester (175gr Sierra MatchKing)
+MV: 2650 fps
+BC (G1): 0.505
+SD: 8.7 fps (10-shot string)
+Energy @ 1000y: 783 ft-lbs
+Wind Drift @ 1000y (10mph): 91.2"
+Drop @ 1000y: 387.4"
+
+// 6.5 Creedmoor (140gr Hornady ELD Match)
+MV: 2710 fps
+BC (G1): 0.646
+SD: 7.3 fps (10-shot string)
+Energy @ 1000y: 989 ft-lbs
+Wind Drift @ 1000y (10mph): 59.7"
+Drop @ 1000y: 340.1"</pre>
+            </div>
+            
+            <h3>Comparative Results</h3>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>.308 Winchester</th>
+                        <th>6.5 Creedmoor</th>
+                        <th>Advantage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Trajectory Flatness</td>
+                        <td>Moderate</td>
+                        <td>Superior</td>
+                        <td>6.5 Creedmoor</td>
+                    </tr>
+                    <tr>
+                        <td>Wind Deflection</td>
+                        <td>Significant</td>
+                        <td>Minimal</td>
+                        <td>6.5 Creedmoor</td>
+                    </tr>
+                    <tr>
+                        <td>Energy Retention</td>
+                        <td>Good</td>
+                        <td>Excellent</td>
+                        <td>6.5 Creedmoor</td>
+                    </tr>
+                    <tr>
+                        <td>Recoil Impulse</td>
+                        <td>Moderate</td>
+                        <td>Light</td>
+                        <td>6.5 Creedmoor</td>
+                    </tr>
+                    <tr>
+                        <td>Ammunition Availability</td>
+                        <td>Excellent</td>
+                        <td>Good</td>
+                        <td>.308 Winchester</td>
+                    </tr>
+                    <tr>
+                        <td>Terminal Performance</td>
+                        <td>Excellent</td>
+                        <td>Very Good</td>
+                        <td>.308 Winchester</td>
+                    </tr>
+                    <tr>
+                        <td>Barrel Life</td>
+                        <td>3000-5000 rounds</td>
+                        <td>2000-3000 rounds</td>
+                        <td>.308 Winchester</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Field Application Analysis</h3>
+            <p>The 6.5 Creedmoor demonstrated clear advantages in extended range engagements, particularly in variable wind conditions. The .308 Winchester maintains superiority in scenarios requiring maximum terminal effect and where ammunition logistics are a consideration. For precision tactical applications beyond 800 yards, the 6.5 Creedmoor provides significant technical advantages that translate to improved first-round hit probability.</p>
+            
+            <h3>Conclusion</h3>
+            <p>While both cartridges remain viable options for precision rifle platforms, the 6.5 Creedmoor offers significant ballistic advantages for long-range precision applications. The .308 Winchester continues to excel in versatility, ammunition availability, and terminal performance. Selection should be based on primary mission requirements and operational parameters.</p>
+        </div>
+    </section>
+    
+    <section id="optics-integration" class="section">
+        <div class="section-title">
+            <h2>OPTICS INTEGRATION SYSTEMS</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: FA-002</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: PRECISION</span>
+                    <span>2024</span>
+                </div>
+                <h3>Optics Integration Systems</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Comprehensive assessment of modern rifle optics with focus on durability, clarity, and deployment suitability. This project evaluated various mounting solutions, optical technologies, and environmental performance factors to determine optimal configurations for tactical applications.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">TEST PLATFORMS</span>
+                        <span>AR-10, SR-25, SCAR-H</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">OPTICS TESTED</span>
+                        <span>17 MODELS</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">MOUNT TYPES</span>
+                        <span>QD, FIXED, CANTILEVERED</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ENVIRONMENTAL</span>
+                        <span>MIL-STD-810G</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">DURABILITY RATING</span>
+                        <span>TIER 1-3</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">FIELD TEST DURATION</span>
+                        <span>12 MONTHS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Primary Testing Objectives</h3>
+            <ul>
+                <li>Zero retention under recoil stress and environmental factors</li>
+                <li>Optical clarity in varied lighting and atmospheric conditions</li>
+                <li>Durability against impact, moisture, and temperature extremes</li>
+                <li>Ergonomics and speed of target acquisition</li>
+                <li>Battery life and power management for electronic optics</li>
+                <li>Weight-to-performance ratio assessments</li>
+            </ul>
+            
+            <h3>Key Findings</h3>
+            <p>Testing revealed significant variance in performance across price points and intended applications. Key findings included:</p>
+            
+            <ul>
+                <li>Cantilever mounts provided superior stability for heavier optics on semi-automatic platforms</li>
+                <li>First focal plane (FFP) designs offered consistent ranging capabilities across magnification ranges</li>
+                <li>Quick-detach systems meeting MIL-STD specifications maintained zero within 0.5 MOA after multiple attach/detach cycles</li>
+                <li>Low-dispersion glass showed measurable advantages in image clarity and light transmission in dawn/dusk conditions</li>
+                <li>Durability testing eliminated 5 optics within first phase of testing due to internal component failures</li>
+            </ul>
+            
+            <h3>Integration System Development</h3>
+            <p>Based on testing results, a modular integration system was developed to optimize optics performance across various platforms. The system incorporates:</p>
+            
+            <ol>
+                <li><strong>Vibration Damping Layer:</strong> Proprietary polymer interface reducing harmonic stress transfer from receiver to optic</li>
+                <li><strong>Precision Rail Interface:</strong> Machined to ±0.001" tolerance with anti-rotation features</li>
+                <li><strong>Environmental Sealing:</strong> Complete waterproof integration between mounting system and optic</li>
+                <li><strong>Tool-less Adjustment:</strong> Field-serviceable tension and elevation adjustments without specialized equipment</li>
+                <li><strong>Multi-Platform Compatibility:</strong> Adaptive mounting solutions for various receiver designs</li>
+            </ol>
+            
+            <h3>Deployment Recommendations</h3>
+            <p>Final recommendations were stratified by operational environment and mission requirements:</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Mission Type</th>
+                        <th>Recommended Optic Type</th>
+                        <th>Mount Configuration</th>
+                        <th>Special Considerations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Urban Operations</td>
+                        <td>1-6x LPVO</td>
+                        <td>QD Cantilever</td>
+                        <td>Illuminated reticle, offset MRDS</td>
+                    </tr>
+                    <tr>
+                        <td>Woodland/Rural</td>
+                        <td>2.5-10x</td>
+                        <td>Fixed Mount</td>
+                        <td>Enhanced light gathering</td>
+                    </tr>
+                    <tr>
+                        <td>Designated Marksman</td>
+                        <td>3-15x FFP</td>
+                        <td>Fixed Precision</td>
+                        <td>MIL/MIL matching, zero stop</td>
+                    </tr>
+                    <tr>
+                        <td>Long Range Precision</td>
+                        <td>5-25x FFP</td>
+                        <td>20+ MOA Base</td>
+                        <td>Advanced reticle, minimal parallax</td>
+                    </tr>
+                    <tr>
+                        <td>Maritime</td>
+                        <td>1-8x LPVO</td>
+                        <td>Anti-Corrosion QD</td>
+                        <td>Nitrogen purged, special coatings</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <section id="maintenance-protocols" class="section">
+        <div class="section-title">
+            <h2>ADVANCED MAINTENANCE PROTOCOLS</h2>
+            <div class="line"></div>
+            <div class="coordinates">REF: FA-003</div>
+        </div>
+        
+        <div class="project-details">
+            <div class="project-header">
+                <div class="project-meta">
+                    <span>OPERATION: MAINTENANCE</span>
+                    <span>2024</span>
+                </div>
+                <h3>Advanced Maintenance Protocols</h3>
+                <p class="coordinates">CLEARANCE LEVEL: PUBLIC</p>
+            </div>
+            
+            <p>Strategic procedures for maintaining operational readiness under adverse environmental conditions. This project developed comprehensive maintenance methodologies optimized for extended field deployment with minimal support infrastructure.</p>
+            
+            <div class="tech-specs">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">PLATFORMS COVERED</span>
+                        <span>AR, AK, PRECISION BOLT</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ENVIRONMENTS</span>
+                        <span>ARID, TROPICAL, MARITIME, ARCTIC</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">MATERIALS TESTED</span>
+                        <span>42 LUBRICANTS, 18 CLEANERS</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">TEST DURATION</span>
+                        <span>18 MONTHS</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">ROUNDS FIRED</span>
+                        <span>95,000+</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">FIELD VALIDATION</span>
+                        <span>COMPLETED</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Environmental Adaptations</h3>
+            <p>Distinct maintenance protocols were developed for each operational environment, addressing the unique challenges presented:</p>
+            
+            <ul>
+                <li><strong>Arid/Desert:</strong> Focused on dust mitigation, heat stress on components, and minimizing lubricant evaporation</li>
+                <li><strong>Tropical:</strong> Addressing corrosion prevention, biological contaminants, and humidity control</li>
+                <li><strong>Maritime:</strong> Specialized for salt exposure, constant moisture, and galvanic corrosion between dissimilar metals</li>
+                <li><strong>Arctic:</strong> Optimized for extreme cold operation, preventing lubricant congealing, and managing condensation during temperature transitions</li>
+            </ul>
+            
+            <h3>Key Protocol Components</h3>
+            <p>Each environmental protocol incorporates multiple elements organized in a systematic approach:</p>
+            
+            <ol>
+                <li><strong>Pre-Deployment Preparation:</strong> Specific treatments and configurations optimized for the target environment</li>
+                <li><strong>Field Maintenance Schedule:</strong> Time and round-count based intervention points with appropriate field procedures</li>
+                <li><strong>Emergency Remediation:</strong> Rapid recovery procedures for environmental exposure or contamination events</li>
+                <li><strong>Long-Term Storage:</strong> Preservation methods for minimizing degradation during extended non-operational periods</li>
+            </ol>
+            
+            <div class="data-block">
+                <pre>// Arctic Environment Protocol Extract
+LUBRICANT PROFILE: Low-viscosity synthetic (Arctic-grade)
+APPLICATION POINTS: Critical friction surfaces only
+APPLICATION VOLUME: Minimal (30% of standard)
+CRITICAL CHECKS:
+- Firing pin channel clear of congealed lubricant
+- Extractor spring tension verified (cold-induced spring rate changes)
+- Magazine spring function at ambient temperature
+- Gas system function (cold-affected port pressure)
+
+COLD WEATHER TRANSITION PROTOCOL:
+1. Allow gradual warming in sealed container to prevent condensation
+2. Immediate dry wipe of all surfaces
+3. Inspect for ice crystal formation in fire control group
+4. Function test before returning to service</pre>
+            </div>
+            
+            <h3>Material Testing Results</h3>
+            <p>Extensive testing of maintenance materials yielded environment-specific recommendations:</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Environment</th>
+                        <th>Optimal Lubricant</th>
+                        <th>Optimal Cleaner</th>
+                        <th>Special Treatment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Arid/Desert</td>
+                        <td>Dry film lubricant</td>
+                        <td>Non-petroleum solvent</td>
+                        <td>Dust cover sealing</td>
+                    </tr>
+                    <tr>
+                        <td>Tropical</td>
+                        <td>Synthetic with anti-fungal</td>
+                        <td>Dewatering formula</td>
+                        <td>VCI barrier film</td>
+                    </tr>
+                    <tr>
+                        <td>Maritime</td>
+                        <td>Heavy grease on critical surfaces</td>
+                        <td>Salt-neutralizing solution</td>
+                        <td>Sacrificial anode (Zinc)</td>
+                    </tr>
+                    <tr>
+                        <td>Arctic</td>
+                        <td>Low-viscosity synthetic</td>
+                        <td>Non-water based solvent</td>
+                        <td>Thermal insulation for components</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Implementation Framework</h3>
+            <p>The protocols were organized into a comprehensive field manual with tiered maintenance schedules:</p>
+            
+            <ul>
+                <li><strong>Level 1 (Daily):</strong> Basic inspection and critical surface maintenance</li>
+                <li><strong>Level 2 (Weekly):</strong> Detailed cleaning and functional testing</li>
+                <li><strong>Level 3 (Monthly):</strong> Complete disassembly and component-level inspection</li>
+                <li><strong>Level 4 (Quarterly):</strong> Preventive replacement of wear items and recalibration</li>
+            </ul>
+            
+            <h3>Field Validation Results</h3>
+            <p>Implementation of these protocols resulted in measurable improvements in multiple metrics:</p>
+            
+            <ul>
+                <li>83% reduction in environment-related malfunctions</li>
+                <li>Extended mean time between failures by average of 2.7x</li>
+                <li>Decreased maintenance time by 37% through optimized procedures</li>
+                <li>Improved parts longevity with 45% reduction in replacement rate</li>
+                <li>Enhanced accuracy retention between maintenance intervals</li>
+            </ul>
+            
+            <h3>Conclusion</h3>
+            <p>The Advanced Maintenance Protocols project demonstrates that environment-specific maintenance strategies significantly improve reliability, operational readiness, and service life of tactical firearms systems. The methodologies developed through this research have been validated in field testing and provide a framework for maximizing performance across diverse deployment scenarios.</p>
+        </div>
+    </section>
+    
+    <section id="related-projects" class="section">
+        <div class="section-title">
+            <h2>RELATED TACTICAL PROJECTS</h2>
+            <div class="line"></div>
+        </div>
+        
+        <div class="related-grid">
+            <div class="project-card">
+                <h3>Low Light Optics Evaluation</h3>
+                <p>Comprehensive analysis of night vision compatible optics and illumination systems for tactical applications.</p>
+                <a href="#" class="tactical-button">VIEW INTEL</a>
+            </div>
+            <div class="project-card">
+                <h3>Urban Environment Tactics</h3>
+                <p>Tactical approaches for close-quarters and urban operational environments with focus on maneuverability.</p>
+                <a href="#" class="tactical-button">VIEW INTEL</a>
+            </div>
+            <div class="project-card">
+                <h3>Field Medical Response</h3>
+                <p>Protocols for immediate medical intervention in tactical situations with limited support resources.</p>
+                <a href="#" class="tactical-button">VIEW INTEL</a>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>TACTICAL PORTFOLIO // FIREARMS ANALYSIS // 2025</p>
+        <p class="coordinates">SECURE CONNECTION ESTABLISHED</p>
+    </footer>
+    
+    <script>
+        // Update time and date in HUD
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', dateOptions);
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+        
+        // Update every second
+        setInterval(updateDateTime, 1000);
+        updateDateTime(); // Initial call
+        
+        // Section animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.section');
+            
+            function checkVisibility() {
+                const windowHeight = window.innerHeight;
+                
+                sections.forEach(section => {
+                    const sectionTop = section.getBoundingClientRect().top;
+                    
+                    if (sectionTop < windowHeight * 0.75) {
+                        section.classList.add('active');
+                    }
+                });
+            }
+            
+            // Check on load and scroll
+            window.addEventListener('scroll', checkVisibility);
+            checkVisibility(); // Initial check
+        });
+    </script>
+</body>
+</html>
