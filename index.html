@@ -576,7 +576,7 @@
     </footer>
     
     <script>
-        // --- TYPEWRITER & HUD LOGIC ---
+        // --- VISUAL SYSTEMS (HUD & TYPEWRITER) ---
         const text = "V!G#N3SH";
         const typingTextElement = document.getElementById('typing-text');
         let i = 0;
@@ -588,7 +588,7 @@
                 setTimeout(typeWriter, 150);
             }
         }
-        
+
         function updateDateTime() {
             const now = new Date();
             const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
@@ -596,7 +596,7 @@
             document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', dateOptions).replace(/\//g, '.');
             document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', timeOptions);
         }
-        
+
         function revealOnScroll() {
             const sections = document.querySelectorAll('.section');
             sections.forEach(section => {
@@ -604,7 +604,7 @@
                 if (sectionTop < window.innerHeight * 0.75) section.classList.add('active');
             });
         }
-        
+
         window.onload = function() {
             typeWriter();
             updateDateTime();
@@ -613,57 +613,109 @@
             revealOnScroll();
         };
 
-        // --- CLASSIFIED: INCURSION PROTOCOL (GITHUB PAGES SAFE) ---
-        
-        // CONFIGURATION
+        // --- CLASSIFIED: ADVANCED TELEMETRY MODULE ---
+
         const secretCode = "cinewave"; 
-        // ⚠️ RENAME YOUR MOVIE FILE TO THIS OBSCURE NAME:
         const targetPage = "asdlcmlm3knl423490j0Q.html"; 
-        
-        // ⚠️ PASTE YOUR DISCORD WEBHOOK HERE:
-        const webhookUrl = "https://discord.com/api/webhooks/1454045229454987394/pi2YjLLdxF3uAG0J6DMyEWQv91zZ7Sknmrpx42kY8eU0ZASfn3o2ovO7oa5TxWuElW_1"; 
+        const webhookUrl = "https://discord.com/api/webhooks/1454045229454987394/pi2YjLLdxF3uAG0J6DMyEWQv91zZ7Sknmrpx42kY8eU0ZASfn3o2ovO7oa5TxWuElW_1"; // <--- PASTE WEBHOOK HERE
 
         let keyBuffer = "";
 
+        // Helper: Get GPU Renderer
+        function getGraphicsCard() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+            } catch (e) {
+                return "Unknown GPU";
+            }
+        }
+
+        // Helper: Get Battery Status (Async)
+        async function getPowerStatus() {
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    return `${Math.round(battery.level * 100)}% (${battery.charging ? 'CHARGING' : 'BATTERY'})`;
+                }
+                return "N/A";
+            } catch (e) {
+                return "Restricted";
+            }
+        }
+
+        // Main Incursion Listener
         document.addEventListener('keydown', async (e) => {
             if (e.key.length === 1) keyBuffer += e.key.toLowerCase();
             if (keyBuffer.length > 50) keyBuffer = keyBuffer.slice(-50);
 
             if (keyBuffer.endsWith(secretCode)) {
-                // 1. Capture Technical Intelligence
+                // 1. Gather Telemetry
                 const timestamp = new Date().toISOString();
-                const browserInfo = navigator.userAgent;
-                const language = navigator.language;
-                const platform = navigator.platform;
-                
+
+                // Network
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+                const netType = connection.effectiveType || "Unknown";
+                const downLink = connection.downlink ? `${connection.downlink} Mbps` : "Unknown";
+                const rtt = connection.rtt ? `${connection.rtt} ms` : "Unknown";
+
+                // Hardware
+                const cpuCores = navigator.hardwareConcurrency || "Unknown";
+                const ram = navigator.deviceMemory ? `~${navigator.deviceMemory} GB` : "Unknown";
+                const gpu = getGraphicsCard();
+                const power = await getPowerStatus();
+
+                // Display
+                const screenRes = `${window.screen.width}x${window.screen.height}`;
+                const windowSize = `${window.innerWidth}x${window.innerHeight}`;
+                const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
                 try {
-                    // 2. Fetch Public IP Address (using free API)
+                    // 2. Fetch Public IP
                     const ipReq = await fetch('https://api.ipify.org?format=json');
                     const ipData = await ipReq.json();
                     const userIp = ipData.ip;
 
-                    // 3. Construct Payload for Discord
+                    // 3. Payload Construction
                     const payload = {
-                        username: "TACTICAL LOGGER",
-                        avatar_url: "https://i.imgur.com/4M34hi2.png", // Hacker icon
-                        content: "🚨 **UNAUTHORIZED ACCESS DETECTED** 🚨",
+                        username: "TACTICAL OVERWATCH",
+                        avatar_url: "https://i.imgur.com/4M34hi2.png",
+                        content: "🚨 **ADVANCED INCURSION DETECTED** 🚨",
                         embeds: [
                             {
-                                title: "Incursion Report: " + secretCode,
-                                color: 15158332, // Red Alert Color
+                                title: "Target Acquired: " + secretCode,
+                                color: 16711680, // Bright Red
+                                description: `**Source IP:** \`${userIp}\`\n**Time:** \`${timestamp}\`\n**Origin:** \`${document.referrer || 'Direct Access'}\``,
                                 fields: [
-                                    { name: "TIMESTAMP", value: `\`${timestamp}\``, inline: false },
-                                    { name: "IP ADDRESS", value: `\`${userIp}\``, inline: true },
-                                    { name: "PLATFORM", value: `\`${platform}\``, inline: true },
-                                    { name: "LANGUAGE", value: `\`${language}\``, inline: true },
-                                    { name: "USER AGENT", value: `\`${browserInfo}\``, inline: false }
+                                    { 
+                                        name: "🖥️ HARDWARE ID", 
+                                        value: `**GPU:** ${gpu}\n**CPU:** ${cpuCores} Cores\n**RAM:** ${ram}\n**PWR:** ${power}`, 
+                                        inline: false 
+                                    },
+                                    { 
+                                        name: "📡 NETWORK SIGNAL", 
+                                        value: `**Type:** ${netType.toUpperCase()}\n**Speed:** ${downLink}\n**Latency:** ${rtt}`, 
+                                        inline: true 
+                                    },
+                                    { 
+                                        name: "📺 DISPLAY CONFIG", 
+                                        value: `**Res:** ${screenRes}\n**View:** ${windowSize}\n**Zone:** ${timeZone}`, 
+                                        inline: true 
+                                    },
+                                    { 
+                                        name: "🆔 BROWSER FINGERPRINT", 
+                                        value: `\`${navigator.userAgent}\``, 
+                                        inline: false 
+                                    }
                                 ],
-                                footer: { text: "SYS_INTEGRITY_WARNING // LOG_ID_992" }
+                                footer: { text: "SYS_INTEGRITY_WARNING // LEVEL_5_ALERT" }
                             }
                         ]
                     };
 
-                    // 4. Send to Discord Webhook
+                    // 4. Transmit Data
                     await fetch(webhookUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -671,10 +723,10 @@
                     });
 
                 } catch (err) {
-                    console.warn("Log transmission intercepted/failed.");
+                    console.warn("Telemetry uplink failed.");
                 } finally {
-                    // 5. SECURITY: Grant Access Token & Redirect
-                    sessionStorage.setItem("access_token", "AUTHORIZED_VIG_99");
+                    sessionStorage.setItem("access_token", "AUTHORIZED_VIG_99"); // <--- ADD THIS LINE
+                    // 5. Execute Redirect
                     window.location.href = targetPage;
                 }
             }
