@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script>
+        // Check for the clearance token
+        if (sessionStorage.getItem("access_token") !== "AUTHORIZED_VIG_99") {
+            // If token is missing, DENY ACCESS immediately
+            // Using 'replace' prevents using the Back button to retry
+            window.location.replace("index.html");
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CINEWAVE - Stream Movies & TV Shows</title>
