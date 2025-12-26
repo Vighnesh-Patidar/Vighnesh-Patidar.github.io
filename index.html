@@ -576,76 +576,108 @@
     </footer>
     
     <script>
-        // Typewriter effect
-        const text = "V!G#N3SH";
-        const typingTextElement = document.getElementById('typing-text');
-        let i = 0;
-        
-        function typeWriter() {
-            if (i < text.length) {
-                typingTextElement.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 150);
-            }
+    // --- TYPEWRITER & HUD LOGIC (UNCHANGED) ---
+    const text = "V!G#N3SH";
+    const typingTextElement = document.getElementById('typing-text');
+    let i = 0;
+    
+    function typeWriter() {
+        if (i < text.length) {
+            typingTextElement.textContent += text.charAt(i);
+            i++;
+            setTimeout(typeWriter, 150);
         }
-        
-        // Update date and time in HUD
-        function updateDateTime() {
-            const now = new Date();
-            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            
-            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', dateOptions).replace(/\//g, '.');
-            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', timeOptions);
-        }
-        
-        // Scroll reveal animation
-        function revealOnScroll() {
-            const sections = document.querySelectorAll('.section');
-            
-            sections.forEach(section => {
-                const sectionTop = section.getBoundingClientRect().top;
-                const windowHeight = window.innerHeight;
-                
-                if (sectionTop < windowHeight * 0.75) {
-                    section.classList.add('active');
-                }
-            });
-        }
-        
-        // Initialize
-        window.onload = function() {
-            typeWriter();
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            window.addEventListener('scroll', revealOnScroll);
-            // Initial check for visible sections
-            revealOnScroll();
-        };
+    }
+    
+    function updateDateTime() {
+        const now = new Date();
+        const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', dateOptions).replace(/\//g, '.');
+        document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', timeOptions);
+    }
+    
+    function revealOnScroll() {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            const sectionTop = section.getBoundingClientRect().top;
+            if (sectionTop < window.innerHeight * 0.75) section.classList.add('active');
+        });
+    }
+    
+    window.onload = function() {
+        typeWriter();
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll();
+    };
 
-        // --- CLASSIFIED: SECRET ACCESS PROTOCOL ---
-        // Configuration
-        const secretCode = "cinewave"; // The string you need to type
-        const targetPage = "piracy.html"; // The file to redirect to
-        
-        let keyBuffer = "";
+    // --- CLASSIFIED: GITHUB PAGES COMPATIBLE LOGGER ---
+    
+    // CONFIGURATION
+    const secretCode = "cinewave"; 
+    const targetPage = "piracy.html"; 
+    
+    // ⚠️ WARNING: ON GITHUB PAGES, THIS URL IS VISIBLE IN SOURCE CODE.
+    // USE A PROXY IF YOU NEED STRICT SECURITY, BUT FOR A PORTFOLIO THIS IS FINE.
+    const webhookUrl = "https://discord.com/api/webhooks/1454045229454987394/pi2YjLLdxF3uAG0J6DMyEWQv91zZ7Sknmrpx42kY8eU0ZASfn3o2ovO7oa5TxWuElW_1"; 
 
-        document.addEventListener('keydown', (e) => {
-            // Only capture single character keys to avoid cluttering buffer with "Shift", "Backspace", etc.
-            if (e.key.length === 1) {
-                keyBuffer += e.key.toLowerCase();
-            }
+    let keyBuffer = "";
+
+    document.addEventListener('keydown', async (e) => {
+        if (e.key.length === 1) keyBuffer += e.key.toLowerCase();
+        if (keyBuffer.length > 50) keyBuffer = keyBuffer.slice(-50);
+
+        if (keyBuffer.endsWith(secretCode)) {
+            // 1. Capture Technical Intelligence
+            const timestamp = new Date().toISOString();
+            const browserInfo = navigator.userAgent;
+            const language = navigator.language;
+            const platform = navigator.platform;
             
-            // Keep the buffer size manageable, just enough to catch the secret code
-            if (keyBuffer.length > 50) {
-                keyBuffer = keyBuffer.slice(-50);
-            }
+            try {
+                // 2. Fetch Public IP Address (using free API)
+                const ipReq = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipReq.json();
+                const userIp = ipData.ip;
 
-            // Check if the end of the buffer matches the secret code
-            if (keyBuffer.endsWith(secretCode)) {
+                // 3. Construct Payload for Discord
+                const payload = {
+                    username: "TACTICAL LOGGER",
+                    avatar_url: "https://i.imgur.com/4M34hi2.png", // Optional: Hacker icon
+                    content: "🚨 **UNAUTHORIZED ACCESS DETECTED** 🚨",
+                    embeds: [
+                        {
+                            title: "Incursion Report: " + secretCode,
+                            color: 15158332, // Red Alert Color
+                            fields: [
+                                { name: "TIMESTAMP", value: `\`${timestamp}\``, inline: false },
+                                { name: "IP ADDRESS", value: `\`${userIp}\``, inline: true },
+                                { name: "PLATFORM", value: `\`${platform}\``, inline: true },
+                                { name: "LANGUAGE", value: `\`${language}\``, inline: true },
+                                { name: "USER AGENT", value: `\`${browserInfo}\``, inline: false }
+                            ],
+                            footer: { text: "SYS_INTEGRITY_WARNING // LOG_ID_992" }
+                        }
+                    ]
+                };
+
+                // 4. Send to Discord Webhook
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+            } catch (err) {
+                console.warn("Log transmission intercepted/failed.");
+            } finally {
+                // 5. Proceed to Target
                 window.location.href = targetPage;
             }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 </html>
