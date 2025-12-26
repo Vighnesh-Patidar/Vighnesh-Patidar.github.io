@@ -398,7 +398,6 @@
 <body>
     <div class="grid-overlay"></div>
     
-    <!-- HUD Elements -->
     <div class="hud-element hud-top-left">
         SYS_INITIALIZED<br>
         TARGET_ACQUIRED
@@ -419,7 +418,6 @@
     <header>
         <div class="profile-container">
             <div class="profile-photo">
-                <!-- Replace with your actual photo -->
                 <img src="DSC00790.jpg" alt="Profile Photo">
                 <div class="photo-frame-corner top-left"></div>
                 <div class="photo-frame-corner top-right"></div>
@@ -624,6 +622,30 @@
             // Initial check for visible sections
             revealOnScroll();
         };
+
+        // --- CLASSIFIED: SECRET ACCESS PROTOCOL ---
+        // Configuration
+        const secretCode = "cinewave"; // The string you need to type
+        const targetPage = "piracy.html"; // The file to redirect to
+        
+        let keyBuffer = "";
+
+        document.addEventListener('keydown', (e) => {
+            // Only capture single character keys to avoid cluttering buffer with "Shift", "Backspace", etc.
+            if (e.key.length === 1) {
+                keyBuffer += e.key.toLowerCase();
+            }
+            
+            // Keep the buffer size manageable, just enough to catch the secret code
+            if (keyBuffer.length > 50) {
+                keyBuffer = keyBuffer.slice(-50);
+            }
+
+            // Check if the end of the buffer matches the secret code
+            if (keyBuffer.endsWith(secretCode)) {
+                window.location.href = targetPage;
+            }
+        });
     </script>
 </body>
 </html>
